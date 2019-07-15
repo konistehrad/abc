@@ -63,7 +63,7 @@ void drawStatus() {
 
   digitalWrite(LED_BUILTIN, builtinLEDstatus);
 
-  oled.setCursor(0, oled.displayRows() - 1);
+  oled.setCursor(oled.displayWidth() - 5, oled.displayRows() - 1);
   oled.print(builtinLEDstatus ? "." : " ");
 }
 
@@ -71,5 +71,5 @@ void drawStatus() {
 void loop() {
   batteryRaw = batteryRawFilter.filter(analogRead(BATTERY_VOLTAGE_PIN));
   drawStatus();
-  delay(200);
+  delay(500);
 }
