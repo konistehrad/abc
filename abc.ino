@@ -1,22 +1,16 @@
-#include <Ewma.h>
+#include <EwmaT.h>
 #include "SSD1306Ascii.h"
 #include "SSD1306AsciiAvrI2c.h"
 
 #define R1 30000.0
 #define R2 7500.0
 #define BATTERY_VOLTAGE_PIN A0
-#define FILTER_WEIGHT 32
-#define SAMPLE_COUNT 10
-
-// 0X3C+SA0 - 0x3C or 0x3D
 #define I2C_ADDRESS 0x3C
-
-// Define proper RST_PIN if required.
 #define RST_PIN -1
 
-Ewma batteryRawFilter(0.1);
+EwmaT<int> batteryRawFilter(1, 10);
 int builtinLEDstatus = 0;
-float batteryRaw;
+int batteryRaw;
 float batteryVoltage = 0;
 uint32_t frame = 0;
 SSD1306AsciiAvrI2c oled;
@@ -75,9 +69,7 @@ void drawStatus() {
 
 //------------------------------------------------------------------------------
 void loop() {
-  int raw = analogRead(BATTERY_VOLTAGE_PIN);
-  batteryRaw = batteryRawFilter.filter(raw);
-  
+  batteryRaw = batteryRawFilter.filter(analogRead(BATTERY_VOLTAGE_PIN));
   drawStatus();
   delay(200);
 }
