@@ -1,6 +1,7 @@
 #include <EwmaT.h>
+#include <Wire.h>
 #include "SSD1306Ascii.h"
-#include "SSD1306AsciiAvrI2c.h"
+#include "SSD1306AsciiWire.h"
 
 #define R1 30000.0
 #define R2 7500.0
@@ -13,7 +14,7 @@ int builtinLEDstatus = 0;
 int batteryRaw;
 float batteryVoltage = 0;
 uint32_t frame = 0;
-SSD1306AsciiAvrI2c oled;
+SSD1306AsciiWire oled;
 //------------------------------------------------------------------------------
 
 float rawToVoltage(float raw) {
@@ -25,26 +26,24 @@ float rawToVoltage(int raw) {
 }
 
 void setup() {
+  Wire.begin();
+  Wire.setClock(400000L);
+  
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(BATTERY_VOLTAGE_PIN, INPUT);
-
-  Serial.begin(9600);
-  Serial.print("Beginning initialiation... ");
 
 #if RST_PIN >= 0
   oled.begin(&Adafruit128x64, I2C_ADDRESS, RST_PIN);
 #else
   oled.begin(&Adafruit128x64, I2C_ADDRESS);
 #endif
-  // Serial.print("OLED initialized! ");
-
   // Call oled.setI2cClock(frequency) to change from the default frequency.
 
   oled.setFont(Adafruit5x7);
-  Serial.println("Starting!");
 }
 
 void drawStatus() {
+  frame += 1;
   builtinLEDstatus = !builtinLEDstatus;
   oled.setRow(0);
   oled.setCol(0);
@@ -59,12 +58,13 @@ void drawStatus() {
   oled.print("Batt V: "); 
   oled.print(rawToVoltage(batteryRaw)); 
   oled.print("V"); 
-  oled.print(" ("); 
-  oled.print(batteryRaw);
-  oled.print(")");
   oled.clearToEOL(); 
   oled.println();
+
   digitalWrite(LED_BUILTIN, builtinLEDstatus);
+
+  oled.setCursor(0, oled.displayRows() - 1);
+  oled.print(builtinLEDstatus ? "." : " ");
 }
 
 //------------------------------------------------------------------------------
