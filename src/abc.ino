@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <EwmaT.h>
 #include <Wire.h>
 #include "SSD1306Ascii.h"
